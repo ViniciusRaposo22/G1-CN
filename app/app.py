@@ -13,7 +13,7 @@ def read_messages():
         with open(messages_file, 'r') as f:
             return json.load(f)
     else:
-        return []  # Retorna uma lista vazia se o arquivo não existir
+        return [] 
 
 # Função para salvar as mensagens no arquivo
 def save_message(message):
@@ -26,13 +26,11 @@ def save_message(message):
 @app.route('/send', methods=['POST'])
 def send_message():
     try:
-        # Tente obter os dados JSON da requisição
         data = request.get_json()
 
         if not data or 'message' not in data:
             return jsonify({'error': 'Mensagem não fornecida ou corpo da requisição inválido'}), 400
 
-        # Armazenando a mensagem
         save_message(data['message'])
         return jsonify({'message': 'Mensagem recebida com sucesso!'}), 200
     except Exception as e:

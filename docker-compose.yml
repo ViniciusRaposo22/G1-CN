@@ -9,7 +9,7 @@ services:
     ports:
       - "5001:5000"
     volumes:
-      - messages_volume:/app/data  # Montando o volume no diretório correto
+      - messages_volume:/app/data 
     networks:
       - app-network
 
@@ -21,7 +21,7 @@ services:
     ports:
       - "5002:5000"
     volumes:
-      - messages_volume:/app/data  # Montando o volume no diretório correto
+      - messages_volume:/app/data
     networks:
       - app-network
 
@@ -33,7 +33,7 @@ services:
     ports:
       - "5003:5000"
     volumes:
-      - messages_volume:/app/data  # Montando o volume no diretório correto
+      - messages_volume:/app/data 
     networks:
       - app-network
 
