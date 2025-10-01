@@ -2,32 +2,38 @@ version: "3.8"
 
 services:
   app1:
-    build: ./app
+    build: 
+      context: .
+      dockerfile: app/Dockerfile
     container_name: app1
     ports:
       - "5001:5000"
     volumes:
-      - messages_volume:data
+      - messages_volume:/app/data  # Montando o volume no diretório correto
     networks:
       - app-network
 
   app2:
-    build: ./app
+    build: 
+      context: .
+      dockerfile: app/Dockerfile
     container_name: app2
     ports:
       - "5002:5000"
     volumes:
-      - messages_volume:data
+      - messages_volume:/app/data  # Montando o volume no diretório correto
     networks:
       - app-network
 
   app3:
-    build: ./app
+    build: 
+      context: .
+      dockerfile: app/Dockerfile
     container_name: app3
     ports:
       - "5003:5000"
     volumes:
-      - messages_volume:data
+      - messages_volume:/app/data  # Montando o volume no diretório correto
     networks:
       - app-network
 

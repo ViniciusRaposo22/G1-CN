@@ -1,52 +1,47 @@
-from flask import Flask, request, jsonify
 import os
-import requests
+import json
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-caminho_arquivo = '/data/mensagens.txt'
+# Caminho para armazenar as mensagens
+messages_file = '/app/data/messages.json'
 
-def salvar_mensagem(mensagem):
-    with open(caminho_arquivo, 'a') as arquivo:
-        arquivo.write(mensagem + '\n')
+# Função para ler as mensagens do arquivo
+def read_messages():
+    if os.path.exists(messages_file):
+        with open(messages_file, 'r') as f:
+            return json.load(f)
+    else:
+        return []  # Retorna uma lista vazia se o arquivo não existir
 
-def obter_mensagens():
-    if os.path.exists(caminho_arquivo):
-        with open(caminho_arquivo, 'r') as arquivo:
-            return arquivo.readlines()
-    return []
-
-def enviar_containers(mensagem):
-    containers = [
-        'http://app2:5000/send',
-        'http://app3:5000/send' 
-    ]
-    for container in containers:
-        try:
-            resposta = requests.post(container, json={"message": mensagem})
-            if resposta.status_code == 201:
-                print(f"Mensagem enviada para {container}")
-        except requests.exceptions.RequestException as erro:
-            print(f"Falha ao enviar mensagem para {container}: {erro}")
+# Função para salvar as mensagens no arquivo
+def save_message(message):
+    messages = read_messages()
+    messages.append(message)
+    
+    with open(messages_file, 'w') as f:
+        json.dump(messages, f)
 
 @app.route('/send', methods=['POST'])
-def receber_mensagem():
-    dados = request.get_json()
-    mensagem = dados.get('message')
-    
-    if mensagem:
-        salvar_mensagem(mensagem)
+def send_message():
+    try:
+        # Tente obter os dados JSON da requisição
+        data = request.get_json()
 
-        enviar_containers(mensagem)
+        if not data or 'message' not in data:
+            return jsonify({'error': 'Mensagem não fornecida ou corpo da requisição inválido'}), 400
 
-        return jsonify({"status": "Mensagem recebida", "message": mensagem}), 201
-    else:
-        return jsonify({"erro": "Nenhuma mensagem fornecida"}), 400
+        # Armazenando a mensagem
+        save_message(data['message'])
+        return jsonify({'message': 'Mensagem recebida com sucesso!'}), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao processar a mensagem: {str(e)}'}), 500
 
 @app.route('/messages', methods=['GET'])
-def listar_mensagens():
-    mensagens = obter_mensagens()
-    return jsonify({"mensagens": mensagens})
+def get_messages():
+    return jsonify({'mensagens': read_messages()})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
